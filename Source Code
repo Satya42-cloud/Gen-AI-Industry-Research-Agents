@@ -1,0 +1,84 @@
+# Import necessary libraries
+import google.generativeai as genai
+
+# Configure your Gemini API Key (replace with your actual key)
+genai.configure(api_key="AIzaSyBg_0TJ_miX2UHYFjxNp9nH7EYGi9LiOJA")  # Replace with your actual Gemini API key
+
+# Initialize the Gemini Pro model
+model = genai.GenerativeModel("gemma-3-27b-it")
+
+# 1️⃣ Industry Researcher Agent
+class IndustryResearcherAgent:
+    def __init__(self, model):
+        self.model = model
+        self.agent_name = "Industry Researcher"
+
+    def run(self, company_name):
+        prompt = f"""
+        You are an expert industry analyst. Conduct a detailed analysis of the {company_name} industry,
+        focusing on current market trends, competitors, key offerings, and strategic opportunities.
+        Include insights on high-growth areas, technological advancements, and unique positioning in the market.
+        """
+        response = self.model.generate_content(prompt)
+        return response.text
+
+# 2️⃣ AI Use Case Strategist Agent
+class AIUseCaseStrategistAgent:
+    def __init__(self, model):
+        self.model = model
+        self.agent_name = "AI Use Case Strategist"
+
+    def run(self, company_name):
+        prompt = f"""
+        As an AI strategy consultant, research current and emerging trends in AI and ML for the {company_name} industry.
+        Suggest innovative and practical use cases for AI that can provide competitive advantages. Focus on use cases
+        that improve efficiency, scalability, and ROI. Include examples of successful AI implementations in similar domains.
+        """
+        response = self.model.generate_content(prompt)
+        return response.text
+
+# 3️⃣ Resource Collector Agent
+class ResourceCollectorAgent:
+    def __init__(self, model):
+        self.model = model
+        self.agent_name = "Resource Collector"
+
+    def run(self, company_name):
+        prompt = f"""
+        As an AI resource specialist, identify and compile a curated list of relevant datasets, tools, and libraries
+        for implementing AI solutions within the {company_name} industry. Ensure that resources are practical and
+        scalable for real-world applications.
+        """
+        response = self.model.generate_content(prompt)
+        return response.text
+
+# 🧑‍💻 Framework: Initialize all agents
+class AIResearchFramework:
+    def __init__(self, model):
+        self.model = model
+        self.industry_researcher = IndustryResearcherAgent(model)
+        self.ai_use_case_strategist = AIUseCaseStrategistAgent(model)
+        self.resource_collector = ResourceCollectorAgent(model)
+
+    def run_all_agents(self, company_name):
+        print(f"\nRunning AI Research Framework for {company_name}...")
+
+        # Run each agent
+        industry_research_response = self.industry_researcher.run(company_name)
+        print("\nIndustry Researcher Response:")
+        print(industry_research_response)
+
+        use_case_response = self.ai_use_case_strategist.run(company_name)
+        print("\nAI Use Case Strategist Response:")
+        print(use_case_response)
+
+        resource_response = self.resource_collector.run(company_name)
+        print("\nResource Collector Response:")
+        print(resource_response)
+
+# Test framework with a sample company
+company_name = "Gravton Motors"  # You can replace this with any company name
+framework = AIResearchFramework(model)
+
+# Run all agents for the given company
+framework.run_all_agents(company_name)
