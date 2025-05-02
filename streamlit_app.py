@@ -1,16 +1,19 @@
-# streamlit_app.py
-
 import streamlit as st
 import google.generativeai as genai
 from fpdf import FPDF
+import unicodedata
 
-# Configure your Gemini API key (use your own key here)
-genai.configure(api_key="AIzaSyBg_0TJ_miX2UHYFjxNp9nH7EYGi9LiOJA")  # Replace with your actual Gemini API key
+# Configure Gemini API key
+genai.configure(api_key="AIzaSyBg_0TJ_miX2UHYFjxNp9nH7EYGi9LiOJA")  # Replace with your own key
 
-# Initialize the Gemini Pro model
+# Initialize Gemini model
 model = genai.GenerativeModel("gemma-3-27b-it")
 
-# Define agents
+# Clean text for PDF compatibility
+def clean_text(text):
+    return unicodedata.normalize("NFKD", text).encode("latin1", "ignore").decode("latin1")
+
+# Agent: Industry Researcher
 class IndustryResearcherAgent:
     def __init__(self, model):
         self.model = model
@@ -24,6 +27,7 @@ class IndustryResearcherAgent:
         response = self.model.generate_content(prompt)
         return response.text
 
+# Agent: AI Use Case Strategist
 class AIUseCaseStrategistAgent:
     def __init__(self, model):
         self.model = model
@@ -37,6 +41,7 @@ class AIUseCaseStrategistAgent:
         response = self.model.generate_content(prompt)
         return response.text
 
+# Agent: Resource Collector
 class ResourceCollectorAgent:
     def __init__(self, model):
         self.model = model
@@ -50,7 +55,7 @@ class ResourceCollectorAgent:
         response = self.model.generate_content(prompt)
         return response.text
 
-# PDF generator
+# PDF generation function
 def generate_pdf(company_name, insights, use_cases, resources):
     pdf = FPDF()
     pdf.add_page()
@@ -59,25 +64,25 @@ def generate_pdf(company_name, insights, use_cases, resources):
     pdf.multi_cell(0, 10, f"AI Insights for {company_name}\n\n")
 
     pdf.set_font("Arial", "B", 12)
-    pdf.multi_cell(0, 10, "📊 Industry Research")
+    pdf.multi_cell(0, 10, "Industry Research")
     pdf.set_font("Arial", size=12)
-    pdf.multi_cell(0, 10, insights + "\n")
+    pdf.multi_cell(0, 10, clean_text(insights) + "\n")
 
     pdf.set_font("Arial", "B", 12)
-    pdf.multi_cell(0, 10, "🤖 AI Use Case Suggestions")
+    pdf.multi_cell(0, 10, "AI Use Case Suggestions")
     pdf.set_font("Arial", size=12)
-    pdf.multi_cell(0, 10, use_cases + "\n")
+    pdf.multi_cell(0, 10, clean_text(use_cases) + "\n")
 
     pdf.set_font("Arial", "B", 12)
-    pdf.multi_cell(0, 10, "📚 AI Resources")
+    pdf.multi_cell(0, 10, "AI Resources")
     pdf.set_font("Arial", size=12)
-    pdf.multi_cell(0, 10, resources + "\n")
+    pdf.multi_cell(0, 10, clean_text(resources) + "\n")
 
     file_path = f"{company_name}_AI_Report.pdf"
     pdf.output(file_path)
     return file_path
 
-# Streamlit UI
+# Streamlit App UI
 st.set_page_config(page_title="AI Research Assistant", layout="centered")
 st.title("🔍 AI Industry Insight Generator")
 
